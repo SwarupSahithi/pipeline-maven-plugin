@@ -6,8 +6,6 @@ COPY settings.xml /root/.m2/settings.xml
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn clean package -DskipTests
-
 # Stage 2: Extract built artifacts
 FROM busybox AS extractor
 WORKDIR /out
