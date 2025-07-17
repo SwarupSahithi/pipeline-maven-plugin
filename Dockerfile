@@ -1,22 +1,20 @@
-# Stage 1: Builder – compiles the plugin
+# Stage 1: Build plugin
 FROM maven:3.8.5-openjdk-17 AS builder
 WORKDIR /app
 
-# Include settings.xml if using snapshots (must exist alongside Dockerfile)
-# COPY settings.xml /root/.m2/settings.xml
-
+COPY settings.xml /root/.m2/settings.xml
 COPY pom.xml .
 COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-# Stage 2: Extractor – grabs the built artifacts
+# Stage 2: Extract built artifacts
 FROM busybox AS extractor
 WORKDIR /out
 COPY --from=builder /app/target/*.hpi .
 COPY --from=builder /app/target/*.jar .
 
-# Stage 3: Final – minimal runtime image
+# Stage 3: Final runtime image
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=extractor /out .
