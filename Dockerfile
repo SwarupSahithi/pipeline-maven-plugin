@@ -1,23 +1,14 @@
-# Stage 1: build
-FROM maven:3.8.5-openjdk-17 AS builder
-WORKDIR /app
 
-# Ensure Jenkins releases are accessible
-COPY settings.xml /root/.m2/settings.xml
+FROM jenkins/jenkins:lts
 
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+USER root
 
-COPY src ./src
-RUN mvn clean package -DskipTests
+RUN apt-get update \
+    && apt-get install -y maven \
+    && rm -rf /var/lib/apt/lists/*
 
-# Stage 2: extract artifact
-FROM openjdk:17-jdk-slim AS extractor
-WORKDIR /out
-COPY --from=builder /app/target/*.hpi . || true
-COPY --from=builder /app/target/*.jar . || true
+ENV MAVEN_HOME=/usr/share/maven \
+    JAVA_HOME=/usr/local/openjdk-17 \
+    PATH=$MAVEN_HOME/bin:$JAVA_HOME/bin:$PATH
 
-# Final runtime image
-FROM busybox:latest
-WORKDIR /plugin
-COPY --from=extractor /out/* . 
+USER jenkins
