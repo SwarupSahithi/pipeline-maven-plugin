@@ -1,25 +1,27 @@
-# Stage 1: build plugin with Maven 3.8.5 + JDK 17
+# == STAGE 1: Build with Maven ==
 FROM maven:3.8.5-openjdk-17 AS builder
+
 WORKDIR /app
 
-# Optional: include custom settings.xml for Jenkins ext-repos
-# COPY settings.xml /root/.m2/settings.xml
+# Add Maven settings to access Jenkins releases/snapshots
+COPY settings.xml /root/.m2/settings.xml
 
-# Copy only what's needed to cache dependencies
-COPY pom.xml .
+# Copy project POM and fetch all dependencies (including missing jenkins-war)
+COPY pom.xml ./
 RUN mvn dependency:go-offline -B
 
-# Copy source and build
+# Copy source and compile/plugin package
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# Stage 2: runtime base (slim JDK)
-FROM openjdk:17-jdk-slim AS runtime
+# == STAGE 2: Extract artifacts ==
+FROM busybox AS extractor
+WORKDIR /out
+COPY --from=builder /app/target/*.hpi . || true
+COPY --from=builder /app/target/*.jar . || true
+
+# == STAGE 3: Production runtime image (optional) ==
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-
-# Copy built plugin artifact (HPI or JAR)
-COPY --from=builder /app/target/*.hpi . 
-# Optionally also copy JAR if your packaging produces one:
-# COPY --from=builder /app/target/*.jar .
-
-CMD ["sh", "-c", "echo 'Artifacts in /app:' && ls -1 /app"]
+COPY --from=extractor /out/ ./
+CMD ["java", "-jar", "pipeline-maven-plugin.hpi"]
