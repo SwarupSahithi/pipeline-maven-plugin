@@ -20,4 +20,11 @@
   <activeProfiles>
     <activeProfile>jenkins-snapshots</activeProfile>
   </activeProfiles>
+  <mirrors>
+    <mirror>
+      <id>jenkins-incrementals</id>
+      <url>https://repo.jenkins-ci.org/incrementals/</url>
+      <mirrorOf>org.jenkins-ci.main:*</mirrorOf>
+    </mirror>
+  </mirrors>
 </settings>
