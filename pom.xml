@@ -30,15 +30,15 @@
   <version>5.19-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Jenkins Plugin Parent POM</name>
-  <description>The Jenkins Plugins Parent POM Project</description>
+  <name>pipeline-maven-plugin</name>
+  <description>pipeline-maven-plugin</description>
   <inceptionYear>2016</inceptionYear>
 
   <scm>
-    <connection>scm:git:https://github.com/jenkinsci/plugin-pom.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/plugin-pom.git</developerConnection>
+    <connection>scm:git:https://github.com/SwarupSahithi/pipeline-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:https://github.com/SwarupSahithi/pipeline-maven-plugin.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/jenkinsci/plugin-pom</url>
+    <url>https://github.com/SwarupSahithi/pipeline-maven-plugin.git</url>
   </scm>
 
   <distributionManagement>
