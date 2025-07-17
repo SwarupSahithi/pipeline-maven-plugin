@@ -1,27 +1,25 @@
-# Stage 1: Build the Jenkins plugin with Maven + JDK 17
-FROM maven:3.8.5-openjdk-17 AS build
+# Stage 1: Build with Maven (has JDK 17 + Maven)
+FROM maven:3.8.5-openjdk-17 AS builder
 WORKDIR /app
 
-# Copy POM and source code
+# Add settings.xml to access Jenkins snapshots/incrementals
+COPY settings.xml /root/.m2/settings.xml
+
+# Copy project files
 COPY pom.xml .
 COPY src ./src
 
-# Build the plugin without tests
+# Build plugin, skip tests
 RUN mvn clean package -DskipTests
 
-# Stage 2: (Optional) Extract only the JAR if needed for other uses
-FROM busybox:1.36.1-glibc AS extractor
+# Stage 2: Extract built artifacts
+FROM busybox AS extractor
 WORKDIR /out
-COPY --from=build /app/target/*.hpi .
-COPY --from=build /app/target/*.jar .  # include any additional artifacts
+COPY --from=builder /app/target/*.hpi .
+COPY --from=builder /app/target/*.jar .
 
-# Stage 3: Runtime environment (if you're using this plugin in an application container)
+# Stage 3: Lightweight runtime (list artifacts for verification)
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-
-# Copy plugin artifact
-# Adjust this as needed depending on where/how you deploy your plugin
-COPY --from=extractor *.hpi ./*.jar ./
-
-# Example entrypoint; modify based on your actual usage:
+COPY --from=extractor /out .
 CMD ["sh", "-c", "ls -l /app"]
