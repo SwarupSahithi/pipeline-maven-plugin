@@ -1,27 +1,23 @@
-# == STAGE 1: Build with Maven ==
+# Stage 1: build
 FROM maven:3.8.5-openjdk-17 AS builder
-
 WORKDIR /app
 
-# Add Maven settings to access Jenkins releases/snapshots
+# Ensure Jenkins releases are accessible
 COPY settings.xml /root/.m2/settings.xml
 
-# Copy project POM and fetch all dependencies (including missing jenkins-war)
-COPY pom.xml ./
+COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source and compile/plugin package
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+RUN mvn clean package -DskipTests
 
-# == STAGE 2: Extract artifacts ==
-FROM busybox AS extractor
+# Stage 2: extract artifact
+FROM openjdk:17-jdk-slim AS extractor
 WORKDIR /out
 COPY --from=builder /app/target/*.hpi . || true
 COPY --from=builder /app/target/*.jar . || true
 
-# == STAGE 3: Production runtime image (optional) ==
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=extractor /out/ ./
-CMD ["java", "-jar", "pipeline-maven-plugin.hpi"]
+# Final runtime image
+FROM busybox:latest
+WORKDIR /plugin
+COPY --from=extractor /out/* . 
