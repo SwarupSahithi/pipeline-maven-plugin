@@ -1,0 +1,23 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>jenkins-snapshots</id>
+      <repositories>
+        <repository>
+          <id>jenkins-snapshots</id>
+          <url>https://repo.jenkins-ci.org/snapshots/</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>jenkins-incrementals</id>
+          <url>https://repo.jenkins-ci.org/incrementals/</url>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>jenkins-snapshots</activeProfile>
+  </activeProfiles>
+</settings>
