@@ -533,14 +533,7 @@
             <artifactId>extra-enforcer-rules</artifactId>
             <version>1.9.0</version>
           </dependency>
-         <dependency>
-  <groupId>org.jenkins-ci.main</groupId>
-  <artifactId>jenkins-war</artifactId>
-  <version>2.479</version>
-  <type>war</type>
-  <scope>test</scope>
-</dependency>
-
+   
         </dependencies>
         <executions>
           <execution>
